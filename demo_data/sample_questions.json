@@ -1,0 +1,110 @@
+{
+  "multilingual_questions": {
+    "en": [
+      "What is photosynthesis?",
+      "How do I solve quadratic equations?",
+      "Explain the water cycle",
+      "What is the capital of Ethiopia?",
+      "How does gravity work?"
+    ],
+    "am": [
+      "ፎቶሲንቴሲስ ምንድን ነው?",
+      "ኳድራቲክ እኩልታዎችን እንዴት እፈታለሁ?",
+      "የውሃ ዑደትን አብራራ",
+      "የኢትዮጵያ ዋና ከተማ ምንድን ነው?",
+      "ስበት እንዴት ይሰራል?"
+    ],
+    "om": [
+      "Photosynthesis maal dha?",
+      "Quadratic equations akkam furi?",
+      "Water cycle ibsi",
+      "Ethiopia magaalaa guddaan maal?",
+      "Gravity akkam hojjata?"
+    ],
+    "ti": [
+      "Photosynthesis እንታይ እዩ?",
+      "Quadratic equations ከመይ እፈቲልዎ?",
+      "Water cycle ኣብራር",
+      "Ethiopia ዋና ከተማ እንታይ እዩ?",
+      "Gravity ከመይ ይሰርሕ?"
+    ],
+    "yo": [
+      "Kini ni photosynthesis?",
+      "Bawo ni mo ṣe ṣe quadratic equations?",
+      "Ṣe alaye water cycle",
+      "Kini ni oluilu Ethiopia?",
+      "Bawo ni gravity ṣe ṣe?"
+    ],
+    "sw": [
+      "Photosynthesis ni nini?",
+      "Vipi ninaweza kutatua quadratic equations?",
+      "Eleza water cycle",
+      "Mji mkuu wa Ethiopia ni nini?",
+      "Gravity inafanya kazi vipi?"
+    ]
+  },
+  "learning_levels": {
+    "beginner": {
+      "en": [
+        "What is 2 + 2?",
+        "What color is the sky?",
+        "How many days are in a week?"
+      ],
+      "am": [
+        "2 + 2 ምንድን ነው?",
+        "ሰማይ ምን ቀለም ነው?",
+        "በሳምንት ስንት ቀናት አሉ?"
+      ]
+    },
+    "intermediate": {
+      "en": [
+        "Explain the process of cellular respiration",
+        "How do you calculate the area of a triangle?",
+        "What are the causes of climate change?"
+      ],
+      "am": [
+        "የሴል የመተንፈስ ሂደትን አብራራ",
+        "የሶስት ማዕዘን ስፋትን እንዴት አስላለህ?",
+        "የአየር ንብረት ለውጥ ምክንያቶች ምንድን ናቸው?"
+      ]
+    },
+    "advanced": {
+      "en": [
+        "Analyze the thermodynamic principles underlying photosynthesis",
+        "Derive the quadratic formula from first principles",
+        "Evaluate the geopolitical implications of climate change policies"
+      ],
+      "am": [
+        "የፎቶሲንቴሲስ መሰረት የሆኑትን የሙቀት ሃይል መርሆች ተንተን",
+        "ኳድራቲክ ቀመርን ከመጀመሪያ መርሆች አግኝ",
+        "የአየር ንብረት ለውጥ ፖሊሲዎች የጂኦፖሊቲካል ተፅእኖዎችን አውጣ"
+      ]
+    }
+  },
+  "topics": {
+    "mathematics": {
+      "en": "Mathematics and numerical concepts",
+      "am": "ሒሳብ እና የቁጥር ጽንሰ-ሀሳቦች",
+      "om": "Herregaa fi yaada lakkoofsaa",
+      "ti": "ሒሳብን እና የቁጥር ሓሳባት",
+      "yo": "Mathematiki ati awọn ero oni-nọmba",
+      "sw": "Hisabati na dhana za nambari"
+    },
+    "science": {
+      "en": "Scientific concepts and natural phenomena",
+      "am": "የሳይንስ ጽንሰ-ሀሳቦች እና የተፈጥሮ ክስተቶች",
+      "om": "Yaada saayinsii fi dhugaatota uumamaa",
+      "ti": "የሳይንስ ሓሳባትን እና የተፈጥሮ ፍጻመታት",
+      "yo": "Awọn ero sayensi ati awọn iṣẹlẹ aye",
+      "sw": "Dhana za kisayansi na matukio ya asili"
+    },
+    "history": {
+      "en": "Historical events and cultural heritage",
+      "am": "የታሪክ ክስተቶች እና የባህል ቅርስ",
+      "om": "Dhugaatota seenaa fi qabeenya aadaa",
+      "ti": "የታሪኽ ፍጻመታትን እና የባህሊ ቅርሲ",
+      "yo": "Awọn iṣẹlẹ itan ati ọrọ-ọrọ asa",
+      "sw": "Matukio ya kihistoria na urithi wa kitamaduni"
+    }
+  }
+}
