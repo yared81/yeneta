@@ -22,7 +22,6 @@ Yeneta is a multilingual AI tutoring platform powered by Retrieval-Augmented Gen
 - **[Development](#-development)**
 - **[Roadmap](#-roadmap)**
 - **[Contributing](#-contributing)**
-- **[License](#-license)**
 - **[Acknowledgments](#-acknowledgments)**
 
 ---
