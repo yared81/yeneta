@@ -77,7 +77,7 @@ README.md                      # This file
 Prerequisites:
 ```bash
 Python 3.10+
-GROQ_API_KEY (if used)
+GROQ_API_KEY 
 SUPABASE_URL and SUPABASE_ANON_KEY
 ```
 
@@ -141,11 +141,7 @@ Contributions are welcome!
 3. Open a pull request with context and screenshots where applicable.
 
 ---
-
-### 📄 License
-MIT. See `LICENSE`.
-
----
+ 
 
 ### 🙏 Acknowledgments
 - LangChain — RAG framework and components
