@@ -856,10 +856,18 @@ class YenetaApp:
             st.session_state.show_public = False
         if "messages" not in st.session_state:
             st.session_state.messages = []
+        if "message_subjects" not in st.session_state:
+            st.session_state.message_subjects = {}
         if "rag_engines_initialized" not in st.session_state:
             st.session_state.rag_engines_initialized = False
         if "uploaded_files" not in st.session_state:
             st.session_state.uploaded_files = []
+        if "file_summaries" not in st.session_state:
+            st.session_state.file_summaries = {}
+        if "study_plans" not in st.session_state:
+            st.session_state.study_plans = {}
+        if "quizzes" not in st.session_state:
+            st.session_state.quizzes = {}
         if "user_profile" not in st.session_state:
             st.session_state.user_profile = {
                 "name": "Student",
@@ -1151,7 +1159,7 @@ document.addEventListener('click', function(e){
                 st.session_state.current_page = "Home"
                 st.rerun()
         with top_col2:
-        st.markdown("### 📊 Student Dashboard")
+            st.markdown("### 📊 Student Dashboard")
         st.markdown(f"Welcome back, {st.session_state.user_profile['name']}! Here's your learning overview")
         
         # Quick stats
@@ -1166,16 +1174,202 @@ document.addEventListener('click', function(e){
             st.metric("Language", st.session_state.user_profile['language_preference'])
         
         # Tab navigation
-        tab1, tab2, tab3 = st.tabs(["💬 Chat", "👤 Profile", "📈 Progress"])
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["💬 Chat", "🕒 History", "📚 Study Plan", "📁 Files", "🧪 Quizzes", "👤 Profile/Progress"])
         
         with tab1:
             self.render_chat_tab()
-        
         with tab2:
-            self.render_profile_tab()
-        
+            self.render_history_tab()
         with tab3:
+            self.render_study_plan_tab()
+        with tab4:
+            self.render_files_tab()
+        with tab5:
+            self.render_quizzes_tab()
+        with tab6:
+            # Combine profile and progress to avoid adding more tabs
+            self.render_profile_tab()
+            st.markdown("---")
             self.render_progress_tab()
+
+    def render_history_tab(self):
+        st.markdown("#### 🕒 Session History")
+        # Filters
+        fcol1, fcol2 = st.columns([2, 1])
+        with fcol1:
+            query = st.text_input("Search questions/answers")
+        with fcol2:
+            subject = st.text_input("Subject tag (optional)")
+        # Filter
+        items = list(st.session_state.messages)
+        if query:
+            items = [m for m in items if query.lower() in m.get("content", "").lower()]
+        if subject:
+            items = [m for m in items if m.get("subject") == subject]
+        # Show last N grouped user+assistant pairs
+        st.markdown("##### Recent interactions")
+        # Build pairs
+        pairs = []
+        current = {}
+        for m in items:
+            if m.get("role") == "user":
+                current = {"q": m}
+            elif m.get("role") == "assistant" and current:
+                current["a"] = m
+                pairs.append(current)
+                current = {}
+        for idx, pair in enumerate(reversed(pairs[-20:])):
+            q = pair.get("q", {})
+            a = pair.get("a", {})
+            with st.expander(f"Q: {q.get('content','')[:60]}..."):
+                st.write("Question:", q.get("content", ""))
+                if a:
+                    st.write("Answer:", a.get("content", ""))
+                c1, c2 = st.columns(2)
+                with c1:
+                    if st.button("Revisit", key=f"rev_{idx}"):
+                        st.session_state.current_page = "Dashboard"
+                        st.session_state.show_public = False
+                        st.session_state.messages.append({"role": "user", "content": q.get("content", "")})
+                        st.rerun()
+                with c2:
+                    if st.button("Improve answer", key=f"imp_{idx}"):
+                        improve_prompt = f"Improve this answer for clarity and completeness, keep it concise. Answer: {a.get('content','')} Context: {q.get('content','')}"
+                        st.session_state.messages.append({"role": "user", "content": improve_prompt})
+                        st.rerun()
+
+    def _ensure_multilingual(self):
+        if not hasattr(self, 'multilingual_rag'):
+            try:
+                from rag_engine.multilingual_rag import MultilingualRAGEngine
+                self.multilingual_rag = MultilingualRAGEngine()
+            except Exception as e:
+                st.warning(f"RAG engine not available: {e}")
+
+    def render_study_plan_tab(self):
+        st.markdown("#### 📚 Study Plan")
+        subj = st.text_input("Subject", placeholder="e.g., Mathematics")
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("Generate/Regenerate Plan") and subj:
+                modules = self._generate_study_modules(subj)
+                st.session_state.study_plans[subj] = {"modules": modules}
+                st.success("Study plan generated.")
+        with c2:
+            if subj and subj in st.session_state.study_plans and st.button("Clear Plan"):
+                st.session_state.study_plans.pop(subj, None)
+                st.rerun()
+        # Display
+        if subj and subj in st.session_state.study_plans:
+            modules = st.session_state.study_plans[subj]["modules"]
+            for i, m in enumerate(modules):
+                col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
+                with col1:
+                    st.write(f"{m['title']} — {m['difficulty']}")
+                with col2:
+                    new_status = st.selectbox("Status", ["todo","in_progress","done"], index=["todo","in_progress","done"].index(m["status"]), key=f"sp_s_{i}")
+                    m["status"] = new_status
+                with col3:
+                    if st.button("Easier", key=f"sp_e_{i}"):
+                        m["difficulty"] = "easy"
+                with col4:
+                    if st.button("Harder", key=f"sp_h_{i}"):
+                        m["difficulty"] = "hard"
+
+    def _generate_study_modules(self, subject: str):
+        # Simple heuristic: derive modules from recent questions
+        recent_qs = [m["content"] for m in st.session_state.messages if m["role"] == "user"][-5:]
+        base = [
+            {"title": f"Core concepts in {subject}", "status": "todo", "difficulty": "medium"},
+            {"title": f"Key terms and definitions in {subject}", "status": "todo", "difficulty": "easy"},
+        ]
+        for q in recent_qs:
+            base.append({"title": f"Practice: {q[:40]}...", "status": "todo", "difficulty": "medium"})
+        return base[:8]
+
+    def render_files_tab(self):
+        st.markdown("#### 📁 Files Intelligence")
+        if not st.session_state.uploaded_files:
+            st.info("Upload files in the Chat tab to see summaries here.")
+            return
+        for f in st.session_state.uploaded_files:
+            name = f.get("name","unknown")
+            summary_obj = st.session_state.file_summaries.get(name)
+            colA, colB = st.columns([3,1])
+            with colA:
+                st.markdown(f"**{name}**")
+            with colB:
+                if st.button("Refresh summary", key=f"refresh_{name}"):
+                    st.session_state.file_summaries.pop(name, None)
+                    st.rerun()
+            if not summary_obj:
+                with st.spinner("Summarizing..."):
+                    text = self._extract_text_from_bytes(f.get("content", b""), name) if isinstance(f.get("content"), bytes) else (f.get("content") or "")
+                    self._ensure_multilingual()
+                    if text:
+                        prompt = "Summarize this content concisely, list 5 bullet key points, and suggest 5 quiz questions.\n\n" + text[:4000]
+                        try:
+                            result = self.multilingual_rag.generate_multilingual_response(query=prompt, context="", target_language="en")
+                        except Exception as e:
+                            result = f"Summary unavailable: {e}"
+                    else:
+                        result = "No extractable text."
+                    st.session_state.file_summaries[name] = {"raw": result}
+                    summary_obj = st.session_state.file_summaries[name]
+            with st.expander("Summary / Key Points / Suggested Quiz"):
+                st.write(summary_obj.get("raw",""))
+            if st.button("Ask about this file", key=f"ask_{name}"):
+                st.session_state.current_page = "Dashboard"
+                st.session_state.show_public = False
+                st.session_state.messages.append({"role": "user", "content": f"Based on {name}, explain the main ideas and give examples."})
+                st.rerun()
+
+    def render_quizzes_tab(self):
+        st.markdown("#### 🧪 Quizzes")
+        subj = st.text_input("Subject for quiz", key="quiz_subject")
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("Generate quiz (5)") and subj:
+                questions = self._generate_quiz(subj, 5)
+                st.session_state.quizzes[subj] = {"questions": questions, "answers": [None]*len(questions)}
+                st.success("Quiz generated.")
+        with c2:
+            if subj and subj in st.session_state.quizzes and st.button("Clear quiz"):
+                st.session_state.quizzes.pop(subj, None)
+                st.rerun()
+        if subj and subj in st.session_state.quizzes:
+            data = st.session_state.quizzes[subj]
+            for i, q in enumerate(data["questions"]):
+                st.markdown(f"**Q{i+1}.** {q['q']}")
+                ans = st.text_input("Your answer", key=f"qa_{i}")
+                if st.button("Check", key=f"qc_{i}"):
+                    correct = q.get("a","")
+                    st.info(f"Correct answer: {correct}")
+                    st.write(q.get("explain",""))
+
+    def _generate_quiz(self, subject: str, n: int):
+        self._ensure_multilingual()
+        try:
+            prompt = f"Create {n} short quiz questions about {subject}. For each, provide: Question, Correct answer, and a 1-sentence explanation."
+            result = self.multilingual_rag.generate_multilingual_response(query=prompt, context="", target_language="en")
+        except Exception as e:
+            result = f"Quiz generation unavailable: {e}"
+        # Very light parser: split lines
+        questions = []
+        for line in result.splitlines():
+            if not line.strip():
+                continue
+            if ':' in line:
+                # naive parse: "Q: ... A: ..."
+                parts = line.split('A:')
+                if len(parts) == 2:
+                    qtext = parts[0].replace('Q','').replace(':','').strip()
+                    atext = parts[1].strip()
+                    questions.append({"q": qtext, "a": atext, "explain": ""})
+        if not questions:
+            # fallback single item
+            questions = [{"q": f"What is a key concept in {subject}?", "a": "Definition and example.", "explain": "Concept overview."} for _ in range(n)]
+        return questions[:n]
 
     def render_chat_tab(self):
         """Render the chat tab with file upload and AI chat"""
@@ -1426,24 +1620,23 @@ document.addEventListener('click', function(e){
             else:
                 # Local fallback: extractive answer from uploaded file context
                 if context:
-                    # Very lightweight heuristic: show a concise excerpt
                     excerpt = context[:800]
                     response = f"Here is what I found in your uploaded files related to your question:\n\n{excerpt}\n\n(Answer generated from uploaded file content. Add GROQ_API_KEY to enable full AI responses.)"
-            else:
-                response = f"""
-                Thank you for your question: "{prompt}"
-                
-                I'm here to help you learn! This is a demo response. In the full implementation, 
-                I would use advanced RAG technology to provide detailed, personalized answers 
+                else:
+                    response = f"""
+                    Thank you for your question: "{prompt}"
+                    
+                    I'm here to help you learn! This is a demo response. In the full implementation, 
+                    I would use advanced RAG technology to provide detailed, personalized answers 
                     in your preferred language ({language}) at your learning level ({level}). If you see this, enable the AI key.
-                
-                The platform supports:
-                - Multilingual responses in 6 African languages
-                - Adaptive learning based on your level
-                - Voice input and output
-                - Progress tracking and analytics
-                - Self-validation for accuracy
-                """
+                    
+                    The platform supports:
+                    - Multilingual responses in 6 African languages
+                    - Adaptive learning based on your level
+                    - Voice input and output
+                    - Progress tracking and analytics
+                    - Self-validation for accuracy
+                    """
             
             return response
             
