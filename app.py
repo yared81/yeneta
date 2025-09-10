@@ -10,6 +10,16 @@ import plotly.express as px
 import plotly.graph_objects as go
 from dotenv import load_dotenv
 
+# Ensure a working sqlite3 for ChromaDB on managed platforms (e.g., Streamlit Cloud)
+try:
+    __import__("pysqlite3")
+    import pysqlite3 as sqlite3  # type: ignore
+    sys.modules["sqlite3"] = sqlite3
+    sys.modules["sqlite3.dbapi2"] = sqlite3
+except Exception:
+    # If pysqlite3 is not present, fall back to system sqlite3
+    pass
+
 # Add the project root to Python path and load environment
 project_root = Path(__file__).parent
 sys.path.append(str(project_root))
