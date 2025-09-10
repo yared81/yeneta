@@ -27,13 +27,16 @@ requests>=2.31.0
 # Language Processing and Detection
 langdetect>=1.0.9
 googletrans>=4.0.0rc1
-polyglot>=16.7.4
+# polyglot requires system packages (e.g., pyicu) that are unavailable on Streamlit Cloud
+# polyglot>=16.7.4
 textblob>=0.17.1
 
-# Voice Processing
-speech-recognition>=3.10.0
-pyttsx3>=2.90
-pyaudio>=0.2.11
+# Voice Processing (optional on Streamlit Cloud)
+# Use correct package name; PyAudio is not available on Streamlit Cloud
+SpeechRecognition==3.10.0
+# pyttsx3 requires audio backends that are unavailable in headless environments
+# pyttsx3>=2.90
+# pyaudio>=0.2.11
 gTTS>=2.4.0
 
 # Database and Authentication
