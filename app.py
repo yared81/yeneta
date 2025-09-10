@@ -588,13 +588,21 @@ st.markdown("""
     
     /* Footer */
     .footer {
-        background: #2c3e50;
-        color: #ecf0f1 !important;
+        background: #111111 !important; /* ensure dark background */
+        color: #ffffff !important;      /* ensure light text */
         padding: 0 !important;
         text-align: left !important;
         width: 100vw !important;
         margin: 0 !important;
     }
+    /* Ensure footer text remains readable on dark background */
+    .footer, .footer *, .footer a, .footer a:visited {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important; /* Safari/Chrome */
+        text-shadow: none !important;
+        opacity: 1 !important;
+    }
+    .footer a:hover { color: #a8b3ff !important; }
     
     .footer-content {
         max-width: 100% !important;
@@ -715,6 +723,19 @@ st.markdown("""
         font-size: 1rem;
         width: 100%;
     }
+    /* Text fields and chat input colors (force light background + dark text) */
+    input, textarea, select { background: #ffffff !important; color: #111111 !important; caret-color: #111111 !important; }
+    input[type="text"], input[type="search"], input[type="number"], input[type="email"], input[type="password"],
+    textarea { background: #ffffff !important; color: #111111 !important; border: 1px solid #ced4da !important; }
+    .stTextInput input, .stTextArea textarea { background: #ffffff !important; color: #111111 !important; border: 1px solid #ced4da !important; }
+    .stSelectbox [data-baseweb="select"] > div, .stMultiSelect [data-baseweb="select"] > div { background: #ffffff !important; color: #111111 !important; border: 1px solid #ced4da !important; }
+    .stSelectbox [role="combobox"], .stMultiSelect [role="combobox"] { background: #ffffff !important; color: #111111 !important; }
+    [data-baseweb="input"] input, [data-baseweb="textarea"] textarea { background: #ffffff !important; color: #111111 !important; }
+    ::placeholder { color: #6c757d !important; opacity: 1 !important; }
+    :-ms-input-placeholder { color: #6c757d !important; }
+    ::-ms-input-placeholder { color: #6c757d !important; }
+    label, .stMarkdown label, .stSelectbox label, .stMultiSelect label { color: #2c3e50 !important; }
+
     /* Chat input colors */
     [data-testid="stChatInput"] textarea { background: #ffffff !important; color: #333333 !important; }
     [data-testid="stChatInput"] button { background: #ffffff !important; color: #333333 !important; border: 1px solid #ced4da !important; }
@@ -761,11 +782,18 @@ st.markdown("""
 
     /* Ensure text is readable (fix cases where text only shows on selection) */
     html, body, .stApp {
-        color: #2c3e50 !important;
+        color: #111111 !important;
+        background: #ffffff !important;
     }
     .stMarkdown, .stMarkdown p, .stMarkdown li, .stMarkdown span, .stMarkdown div,
     p, li, span, div {
-        color: #2c3e50 !important;
+        color: #111111 !important;
+    }
+    /* Do not override footer contrast */
+    .footer, .footer * {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        opacity: 1 !important;
     }
     h1, h2, h3, h4, h5, h6 { color: #2c3e50 !important; }
     a { color: #2c3e50 !important; text-decoration: none !important; }
