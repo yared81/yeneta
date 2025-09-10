@@ -38,7 +38,7 @@ except ImportError as e:
 
 # Page configuration
 st.set_page_config(
-    page_title="🌍 Yeneta - Multilingual AI Study Platform",
+    page_title=" Yeneta - Multilingual AI Study Platform",
     page_icon="🌍",
     layout="wide",
     initial_sidebar_state="collapsed"
